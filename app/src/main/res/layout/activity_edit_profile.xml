@@ -71,7 +71,26 @@
             android:background="@drawable/edit_text_background"
             android:padding="12dp"/>
 
+        <!-- New Password Fields -->
+        <EditText
+            android:id="@+id/password"
+            style="@style/ProfileEditText"
+            android:hint="New Password (leave blank to keep current)"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray"
+            android:background="@drawable/edit_text_background"
+            android:padding="12dp"/>
 
+        <EditText
+            android:id="@+id/confirmPassword"
+            style="@style/ProfileEditText"
+            android:hint="Confirm New Password"
+            android:inputType="textPassword"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray"
+            android:background="@drawable/edit_text_background"
+            android:padding="12dp"/>
 
         <!-- Save Changes Button -->
         <Button

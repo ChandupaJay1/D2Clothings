@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class EditProfileActivity extends AppCompatActivity {
     private FirebaseFirestore db;
-    private EditText fullName, phone, address, city;
+    private EditText fullName, phone, address, city, password, confirmPassword;
     private ImageView profileImage;
     private Button saveBtn, uploadImageBtn;
 
@@ -44,6 +44,8 @@ public class EditProfileActivity extends AppCompatActivity {
         phone = findViewById(R.id.phone);
         address = findViewById(R.id.address);
         city = findViewById(R.id.city);
+        password = findViewById(R.id.password);
+        confirmPassword = findViewById(R.id.confirmPassword);
         profileImage = findViewById(R.id.profileImage);
         saveBtn = findViewById(R.id.saveBtn);
         uploadImageBtn = findViewById(R.id.uploadImageBtn);
@@ -65,6 +67,8 @@ public class EditProfileActivity extends AppCompatActivity {
                         phone.setText(document.getString("phone"));
                         address.setText(document.getString("address"));
                         city.setText(document.getString("city"));
+                        // Don't load password for security reasons
+                        // Leave password fields empty
 
                         currentImagePath = document.getString("profileImage");
                         if (currentImagePath != null && !currentImagePath.isEmpty()) {
@@ -140,6 +144,22 @@ public class EditProfileActivity extends AppCompatActivity {
         String userPhone = phone.getText().toString();
         String userAddress = address.getText().toString();
         String userCity = city.getText().toString();
+        String userPassword = password.getText().toString();
+        String userConfirmPassword = confirmPassword.getText().toString();
+
+        // Validate password change
+        if (!userPassword.isEmpty()) {
+            if (!userPassword.equals(userConfirmPassword)) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // You should implement proper password validation here
+            if (userPassword.length() < 6) {
+                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
         Map<String, Object> userProfile = new HashMap<>();
         userProfile.put("fullName", name);
@@ -148,12 +168,20 @@ public class EditProfileActivity extends AppCompatActivity {
         userProfile.put("city", userCity);
         userProfile.put("profileImage", currentImagePath); // Save updated image path
 
+        // Only update password if a new one was entered
+        if (!userPassword.isEmpty()) {
+            userProfile.put("password", userPassword);
+        }
+
         db.collection("users").document(userEmail)
                 .set(userProfile, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show();
                     finish(); // Close activity after saving
                 })
-                .addOnFailureListener(e -> Log.e("Firestore", "Error updating profile", e));
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error updating profile", e);
+                    Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
+                });
     }
 }
